@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "feng.h"
+#include "dacsis.h"
 
 int countCharFile( const char sep, FILE *fp, enum stopread stop, char quote ){
 	int c, counter = 0;
