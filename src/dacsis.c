@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "dacsis.h"
 
 int countCharFile( const char sep, FILE *fp, enum stopread stop, char quote ){
@@ -69,4 +70,10 @@ void readLineSplitQuoted( char *line, char **splitdat, char sep, char quote ){
 	splitdat[j][k] = '\0';
 }
 
-
+int countDacsis( char ***dacsis ){
+	int i = 0;
+	while( dacsis[i] != NULL ){
+		i++;
+	}
+	return i;
+}
