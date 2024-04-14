@@ -1,0 +1,56 @@
+% -----------------------------------------------------------------------------
+% Author: Ricardo Hernández Osorio.
+% Created: Saturday, February-18-2023
+% Description: Template to create plots.
+% -----------------------------------------------------------------------------
+\documentclass[multi=wrapper,crop,tikz]{standalone}
+% Usepackage loaded {{{
+% Inputenc, Fontenc, Babel, Lmodern {{{
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,mexico,es-noindentfirst]{babel}
+\usepackage{lmodern}
+% End: Inputenc, Fontenc, Babel, Lmodern }}}
+% Mathtools, Amssymb {{{
+\usepackage{mathtools}
+\usepackage{amssymb}
+% End: Mathtools, Amssymb }}}
+% Graphicx {{{
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+% End: Graphicx }}}
+% Tikz libraries {{{
+\usetikzlibrary{angles,intersections,calc,babel}
+\usetikzlibrary{patterns}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{matrix}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{fit}
+% End: Tikz libraries }}}
+% PGFplots {{{
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17,table/search path={./data/}}
+% End: PGFplots }}}
+% End: Usepackage loaded }}}
+\begin{document}
+\begin{wrapper}
+  \begin{tikzpicture}
+	\begin{axis}[
+	  scaled ticks=false,
+	  cycle list name=exotic,
+	  axis y line=left,
+	  axis x line=center,
+	  xlabel={Names},
+	  xtick=data,
+	  xticklabels from table={namesstats.csv}{Names},
+	]
+	\addplot+ [very thin] table
+	  [x=Names, y=Counts, col sep=comma]
+	  {namesstats.csv};
+	\end{axis}
+  \end{tikzpicture}
+\end{wrapper}
+\end{document}
+
+
