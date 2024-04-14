@@ -47,8 +47,6 @@ int main(  ){
 		}
 	}
 
-	printf( "Number of columns: %d\n" , columns );
-	printf( "Number of rows: %d\n" , lines );
 	printf( "\n" );
 	printf( "---- Test Line: ----\n" );
 	printf( "******************\n" );
@@ -92,15 +90,18 @@ int main(  ){
 		readLineSplit( dacsis[ i ][ 0 ], openings[ i ], ',' );
 	}
 
-	for( int i = 0; i < lines - repopenings; i++ ){
+	for( int i = 0; i < lines ; i++ ){
 		for( int j = 0; strlen( openings[ i ][ j ] ) > 0; j++ ){
 			printf( "%s\t", openings[ i ][ j ] );
 		}
 		printf( "\n" );
 	}
 
+	printf( "\n" );
 	printf( "Number of repeated openings: %d\n" , repopenings );
 	printf( "Number of unique values in openings: %d\n" , lines - repopenings);
+	printf( "Total Number of columns: %d\n" , columns );
+	printf( "Total Number of rows: %d\n" , lines );
 
 	for( int i = 0 ; i < lines ; i++ ){
 		for( int j = 0 ; j < columns ; j++ ){
