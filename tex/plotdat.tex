@@ -34,32 +34,35 @@
 \usepackage{pgfplotstable}
 \pgfplotsset{compat=1.17,table/search path={./data/}}
 \pgfplotstableset{%
+  assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
+  every even row/.style={before row={\rowcolor[gray]{0.9}}},
   columns/Counts/.style={int detect,column type=r,column name=\textsc{Frequency}},
   columns/Names/.style={string type,column type=l,column name=\textsc{Openings}},
+  every head row/.style={before row=\toprule,after row=\midrule},
+  every last row/.style={after row=\bottomrule},
 }
 % End: PGFplots }}}
 % End: Usepackage loaded }}}
 \begin{document}
-% \begin{wrapper}
-%   \begin{tikzpicture}
-% 	\begin{axis}[
-% 	  cycle list name=exotic,
-% 	]
-% 	\addplot+ [very thin] table
-% 	  [x=Counts, col sep=comma]
-% 	  {namesstats.csv};
-% 	\end{axis}
-%   \end{tikzpicture}
-% \end{wrapper}
+\begin{wrapper}
+  \begin{tikzpicture}
+	\begin{axis}[
+	  width=12cm,
+	  enlargelimits=false,
+	  ymin=0,
+	  cycle list name=exotic,
+	]
+	\addplot [const plot] table
+	[x expr=\coordindex, y=Counts,col sep=comma]
+	{namesstats_sorted.csv};
+	\end{axis}
+  \end{tikzpicture}
+\end{wrapper}
 \begin{wrapper}
   \pgfplotstabletypeset[%
 	col sep=comma,
 	trim cells=true,
 	columns={Names,Counts},
-	columns/Names/.style={string type,column type=l,column name=\textsc{Openings}},
-	columns/Counts/.style={int detect,column type=r,column name=\textsc{Frequency}},
-	every head row/.style={before row=\toprule,after row=\midrule},
-	every last row/.style={after row=\bottomrule},
   ]{namesstats_sorted.csv}
 \end{wrapper}
 \end{document}
