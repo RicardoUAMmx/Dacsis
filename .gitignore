@@ -1,3 +1,4 @@
 
 dacsis
 src/*.o
+*.sh
