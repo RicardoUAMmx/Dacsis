@@ -2,3 +2,4 @@
 dacsis
 src/*.o
 *.sh
+__pycache__
