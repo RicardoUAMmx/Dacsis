@@ -25,21 +25,25 @@ def lineHandler(s,sep=',',quote='"'):
 
     return result
 
-def printLine(file, n):
+def lineColumn(file, n=[], columns=[]):
+    result = []
+    line = []
     i = 0
     with open(file, 'r') as f:
-        while True:
+        s = f.readline().strip()
+        while s:
+            if i in n:
+                if columns != []:
+                    for c in columns:
+                        line.append(lineHandler(s)[c])
+                    result.append(line)
+                else:
+                    line = lineHandler(s)
+                    result.append(line)
+
+            line = []
             s = f.readline().strip()
-            if i == n:
-                print(f'Line {i} Contents: --------')
-                print('\n'.join(lineHandler(s)))
-                print('---------------------------')
-
             i += 1
-            if not s:
-                break
+    return result
 
-if __name__ == '__main__':
-    csvfile = 'data/openings.csv'
-    printLine(csvfile, 203)
 
