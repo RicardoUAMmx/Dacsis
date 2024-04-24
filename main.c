@@ -12,6 +12,7 @@ int main( int argc, char **argv ){
 	int idxs[  ] = { 1, 3, 4, 5, 7, 8, 9, 10, -1 };
 	int lenidxs = ( sizeof( idxs ) / sizeof( idxs[ 0 ] ) ) - 1;
 	printf( "Selected columns: %d\n" , lenidxs );
+
 	if( argv[1] == NULL ){
 		printf( "No filename provided\n" );
 		exit( 1 );
