@@ -3,11 +3,8 @@
 #include <string.h>
 #include "dacsis.h"
 
-int main(  ){
-	FILE *fp;
+int main( int argc, char **argv ){
 	char *streamline = ( char * )malloc( BUFFER_LINE );
-	int header = 1;
-	char sep = ',';
 	long int savepos;
 	int columns = 0, lines = 0;
 	int c;
@@ -15,12 +12,30 @@ int main(  ){
 	int idxs[  ] = { 1, 3, 4, 5, 7, 8, 9, 10, -1 };
 	int lenidxs = ( sizeof( idxs ) / sizeof( idxs[ 0 ] ) ) - 1;
 	printf( "Selected columns: %d\n" , lenidxs );
+	if( argv[1] == NULL ){
+		printf( "No filename provided\n" );
+		exit( 1 );
+	}
 
-	fp = fopen( "data/openings.csv" , "r" );
+	char fnm[32];
+	if( strncpy( fnm, argv[1], 32 ) == NULL ){
+		printf( "Error copying filename\n" );
+		exit( 1 );
+	}
+
+	if( argc != 4 ){
+		printf( "Usage: %s <filename> <header> <separator>\n" , argv[0] );
+		exit( 1 );
+	}
+
+	FILE *fp;
+	fp = fopen( fnm , "r" );
 	if( fp == NULL ){
 		printf( "File not found\n" );
-		return 0;
+		exit( 1 );
 	}
+	int header = atoi( argv[2] );
+	char sep = argv[3][0];
 
 	while( header-- ){
 		while( fgetc( fp ) != '\n' );
