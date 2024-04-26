@@ -1,31 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "dacsis.h"
+#define BUFF_FNAME 32
+#define BUFF_CELL 256
 
 int main( int argc, char **argv ){
-	char *streamline = ( char * )malloc( BUFFER_LINE );
-	long int savepos;
-	int columns = 0, lines = 0;
-	int c;
-
-	int idxs[  ] = { 1, 3, 4, 5, 7, 8, 9, 10, -1 };
-	int lenidxs = ( sizeof( idxs ) / sizeof( idxs[ 0 ] ) ) - 1;
-	printf( "Selected columns: %d\n" , lenidxs );
-
 	if( argv[1] == NULL ){
 		printf( "No filename provided\n" );
 		exit( 1 );
 	}
 
-	char fnm[32];
-	if( strncpy( fnm, argv[1], 32 ) == NULL ){
-		printf( "Error copying filename\n" );
-		exit( 1 );
-	}
+	char fnm[BUFF_FNAME];
+	strncpy( fnm , argv[1] , BUFF_FNAME );
 
-	if( argc != 4 ){
-		printf( "Usage: %s <filename> <header> <separator>\n" , argv[0] );
+	if( argc != 5 ){
+		printf( "Usage: %s <filename> <header> <separator> <quoted>\n" , argv[0] );
 		exit( 1 );
 	}
 
@@ -37,100 +26,64 @@ int main( int argc, char **argv ){
 	}
 	int header = atoi( argv[2] );
 	char sep = argv[3][0];
+	int quoted = argv[4][0];
 
 	while( header-- ){
 		while( fgetc( fp ) != '\n' );
 	}
 
-	savepos = ftell( fp );
-	columns = countCharFile( ',', fp, eol, '"' );
-	columns++;
-	fseek( fp , savepos , SEEK_SET );
-
-	lines = countCharFile( '\n', fp, eof, '"' );
-	fseek( fp , savepos , SEEK_SET );
-
-	char **dataline = ( char ** )malloc( columns * sizeof( char * ) );
-	for( int i = 0 ; i < columns ; i++ ){
-		dataline[ i ] = ( char * )malloc( BUFFER_WORD );
-	}
-
-	char ***dacsis = ( char *** )malloc( lines * sizeof( char ** ) );
-	for( int i = 0 ; i < lines ; i++ ){
-		dacsis[ i ] = ( char ** )malloc( columns * sizeof( char * ) );
-		for( int j = 0 ; j < columns ; j++ ){
-			dacsis[ i ][ j ] = ( char * )malloc( BUFFER_WORD );
+	long int start = ftell( fp );
+	int c;
+	int cols = 0;
+	while( (c = fgetc( fp )) != '\n' ){
+		if( c == sep ){
+			cols++;
+		} else if( c == quoted ){
+			while( (c = fgetc( fp )) != quoted );
 		}
 	}
+	fseek( fp , start , SEEK_SET );
 
-	printf( "\n" );
-	printf( "---- Test Line: ----\n" );
-	printf( "******************\n" );
-	for( int i = 0 ; i < lines ; i++ ){
-		readLineFile( streamline, fp );
-		readLineSplitQuoted( streamline, dataline, sep, '"' );
-		for( int j = 0; idxs[ j ] != -1 ; j++ ){
-			strncpy( dacsis[ i ][ j ], dataline[ idxs[ j ] ], BUFFER_WORD );
-		}
-	}
-	// for( int i = 0 ; i < lines ; i++ ){
-	// 	for( int j = 0; j < lenidxs ; j++ ){
-	// 		printf( "%s\t", dacsis[ i ][ j ] );
-	// 	}
-	// 	printf( "\n" );
-	// }
-	printf( "******************\n" );
-	printf( "\n" );
-
-	int repopenings = 0;
-	for( int i = 1; i < lines; i++ ){
-		for( int j = i - 1; j >= 0; j-- ){
-			if( strcmp( dacsis[ i ][ 0 ], dacsis[ j ][ 0 ] ) == 0 ){
-				repopenings++;
-				break;
-			} else {
-
+	int i = 0, j = 0;
+	char **line = ( char ** )malloc( sizeof( char * ) );
+	line[j] = ( char * )malloc( sizeof( char ) * BUFF_CELL );
+	while( (c = fgetc( fp )) != EOF ){
+		if( c != sep && c != '\n' && c != quoted && i < BUFF_CELL ){
+			line[j][i] = c;
+			i++;
+		} else if( c == quoted ){
+			while( (c = fgetc( fp )) != quoted && i < BUFF_CELL ){
+				line[j][i] = c;
+				i++;
 			}
+		} else if( c == '\n' ){
+			line[j][i] = '\0';
+			j++;
+			i = 0;
+			line = ( char ** )realloc( line , sizeof( char * ) * j+1 );
+			line[j] = ( char * )malloc( sizeof( char ) * BUFF_CELL );
+		} else if ( c == sep ){
+			line[j][i] = '\0';
+			j++;
+			i = 0;
+			line = ( char ** )realloc( line , sizeof( char * ) * j+1 );
+			line[j] = ( char * )malloc( sizeof( char ) * BUFF_CELL );
+		} else if( i == BUFF_CELL ){
+			printf( "Buffer overflow\n" );
+			exit( 1 );
 		}
 	}
 
-	char ***openings = ( char *** )malloc( ( lines ) * sizeof( char ** ) );
-	for( int i = 0 ; i < lines ; i++ ){
-		openings[ i ] = ( char ** )malloc( lenidxs * sizeof( char * ) );
-		for( int j = 0 ; j < lenidxs ; j++ ){
-			openings[ i ][ j ] = ( char * )malloc( BUFFER_WORD );
-		}
+	for( i = 0; i < j; i=i+cols+1 ){
+		printf( "%70s\n", line[i+1] );
 	}
 
-	for( int i = 0; i < lines ; i++ ){
-		readLineSplit( dacsis[ i ][ 0 ], openings[ i ], ',' );
+	for( i = 0; i < j+1; i++ ){
+		free( line[i] );
 	}
+	free( line );
 
-	for( int i = 0; i < lines ; i++ ){
-		for( int j = 0; strlen( openings[ i ][ j ] ) > 0; j++ ){
-			printf( "%s\t", openings[ i ][ j ] );
-		}
-		printf( "\n" );
-	}
-
-	printf( "\n" );
-	printf( "Number of repeated openings: %d\n" , repopenings );
-	printf( "Number of unique values in openings: %d\n" , lines - repopenings);
-	printf( "Total Number of columns: %d\n" , columns );
-	printf( "Total Number of rows: %d\n" , lines );
-
-	for( int i = 0 ; i < lines ; i++ ){
-		for( int j = 0 ; j < columns ; j++ ){
-			free( dacsis[ i ][ j ] );
-		}
-		free( dacsis[ i ] );
-	}
-	free( dacsis );
-	for( int i = 0 ; i < columns ; i++ ){
-		free( dataline[ i ] );
-	}
-	free( dataline );
-	free( streamline );
 	fclose( fp );
+
 	return 0;
 }
